@@ -1,0 +1,81 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <title></title>
+  <meta name="Generator" content="Cocoa HTML Writer">
+  <meta name="CocoaVersion" content="2685.2">
+  <style type="text/css">
+    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica}
+    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; min-height: 14.0px}
+  </style>
+</head>
+<body>
+<p class="p1">&lt;!DOCTYPE html&gt;</p>
+<p class="p1">&lt;html lang="ja"&gt;</p>
+<p class="p1">&lt;head&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;meta charset="UTF-8"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;title&gt;授業用タイマー&lt;/title&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;style&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>body { margin: 0; background: #222; color: #fff; font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; overflow: hidden; }</p>
+<p class="p1"><span class="Apple-converted-space">        </span>#timer { font-size: 30vw; font-weight: bold; font-variant-numeric: tabular-nums; line-height: 1; }</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.controls { margin-top: 20px; }</p>
+<p class="p1"><span class="Apple-converted-space">        </span>button { font-size: 2rem; padding: 10px 20px; cursor: pointer; border: none; border-radius: 10px; background: #444; color: white; margin: 0 10px; }</p>
+<p class="p1"><span class="Apple-converted-space">        </span>button:hover { background: #666; }</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.warning { color: #ffeb3b; } /* 1分前 */</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.danger { color: #f44336; }<span class="Apple-converted-space">  </span>/* 終了 */</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/style&gt;</p>
+<p class="p1">&lt;/head&gt;</p>
+<p class="p1">&lt;body&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div id="timer"&gt;05:00&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="controls"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;button onclick="addTime(60)"&gt;+1分&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;button onclick="toggleTimer()" id="startBtn"&gt;スタート&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;button onclick="resetTimer()"&gt;リセット&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;script&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>let timeLeft = 300;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>let timerId = null;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>function updateDisplay() {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const min = Math.floor(timeLeft / 60);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const sec = timeLeft % 60;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const display = `${min.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const timerEl = document.getElementById('timer');</p>
+<p class="p1"><span class="Apple-converted-space">            </span>timerEl.textContent = display;</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>// 色の変化</p>
+<p class="p1"><span class="Apple-converted-space">            </span>timerEl.className = '';</p>
+<p class="p1"><span class="Apple-converted-space">            </span>if (timeLeft &lt;= 0) timerEl.classList.add('danger');</p>
+<p class="p1"><span class="Apple-converted-space">            </span>else if (timeLeft &lt;= 60) timerEl.classList.add('warning');</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>function toggleTimer() {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>if (timerId) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>clearInterval(timerId);</p>
+<p class="p1"><span class="Apple-converted-space">                </span>timerId = null;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>document.getElementById('startBtn').textContent = 'スタート';</p>
+<p class="p1"><span class="Apple-converted-space">            </span>} else {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>timerId = setInterval(() =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>if (timeLeft &gt; 0) {</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>timeLeft--;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>updateDisplay();</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>} else {</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>clearInterval(timerId);</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>alert("時間です！");</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">                </span>}, 1000);</p>
+<p class="p1"><span class="Apple-converted-space">                </span>document.getElementById('startBtn').textContent = '一時停止';</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>function addTime(seconds) { timeLeft += seconds; updateDisplay(); }</p>
+<p class="p1"><span class="Apple-converted-space">        </span>function resetTimer() { timeLeft = 300; updateDisplay(); }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/script&gt;</p>
+<p class="p1">&lt;/body&gt;</p>
+<p class="p1">&lt;/html&gt;</p>
+</body>
+</html>
