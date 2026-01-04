@@ -3,42 +3,63 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>授業用タイマー</title>
+    <title>授業用タイマー（カスタム）</title>
     <style>
         body { margin: 0; background: #222; color: #fff; font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; overflow: hidden; }
-        #timer { font-size: 30vw; font-weight: bold; font-variant-numeric: tabular-nums; line-height: 1; }
+        /* 時間の部分をクリックできることがわかるように */
+        #timer { font-size: 30vw; font-weight: bold; font-variant-numeric: tabular-nums; line-height: 1; cursor: pointer; transition: 0.3s; }
+        #timer:hover { opacity: 0.7; }
         .controls { margin-top: 20px; }
-        button { font-size: 2rem; padding: 10px 20px; cursor: pointer; border: none; border-radius: 10px; background: #444; color: white; margin: 0 10px; }
+        button { font-size: 2rem; padding: 10px 25px; cursor: pointer; border: none; border-radius: 10px; background: #444; color: white; margin: 0 10px; }
         button:hover { background: #666; }
         .warning { color: #ffeb3b; }
         .danger { color: #f44336; }
+        .hint { margin-top: 10px; font-size: 1.2rem; color: #888; }
     </style>
 </head>
 <body>
-    <div id="timer">05:00</div>
+    <div id="timer" onclick="setTime()">05:00</div>
+    <div class="hint">数字をクリックして時間を変更できます</div>
     <div class="controls">
         <button onclick="addTime(60)">+1分</button>
         <button onclick="toggleTimer()" id="startBtn">スタート</button>
         <button onclick="resetTimer()">リセット</button>
     </div>
+
     <script>
+        let initialTime = 300; // リセット用の初期値
         let timeLeft = 300;
         let timerId = null;
+
         function updateDisplay() {
             const min = Math.floor(timeLeft / 60);
             const sec = timeLeft % 60;
             const display = `${min.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`;
             const timerEl = document.getElementById('timer');
             timerEl.textContent = display;
+            
             timerEl.className = '';
             if (timeLeft <= 0) timerEl.classList.add('danger');
             else if (timeLeft <= 60) timerEl.classList.add('warning');
         }
+
+        // 時間を設定する機能
+        function setTime() {
+            const input = prompt("何分に設定しますか？ (例: 3 または 10)", Math.floor(initialTime / 60));
+            if (input !== null && !isNaN(input) && input > 0) {
+                initialTime = parseInt(input) * 60;
+                timeLeft = initialTime;
+                updateDisplay();
+                if (timerId) toggleTimer(); // タイマー動作中なら停止
+            }
+        }
+
         function toggleTimer() {
+            const btn = document.getElementById('startBtn');
             if (timerId) {
                 clearInterval(timerId);
                 timerId = null;
-                document.getElementById('startBtn').textContent = 'スタート';
+                btn.textContent = 'スタート';
             } else {
                 timerId = setInterval(() => {
                     if (timeLeft > 0) {
@@ -46,14 +67,29 @@
                         updateDisplay();
                     } else {
                         clearInterval(timerId);
-                        alert("時間です！");
+                        timerId = null;
+                        btn.textContent = 'スタート';
+                        alert("Time's up!");
                     }
                 }, 1000);
-                document.getElementById('startBtn').textContent = '一時停止';
+                btn.textContent = '一時停止';
             }
         }
-        function addTime(seconds) { timeLeft += seconds; updateDisplay(); }
-        function resetTimer() { timeLeft = 300; updateDisplay(); }
+
+        function addTime(seconds) {
+            timeLeft += seconds;
+            updateDisplay();
+        }
+
+        function resetTimer() {
+            timeLeft = initialTime;
+            updateDisplay();
+            if (timerId) {
+                clearInterval(timerId);
+                timerId = null;
+                document.getElementById('startBtn').textContent = 'スタート';
+            }
+        }
     </script>
 </body>
 </html>
